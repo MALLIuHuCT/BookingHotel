@@ -1,0 +1,114 @@
+﻿@page "/hotels"
+
+@using System.Drawing
+@using System.IO
+@using System.Net.Mime
+@using System.Security.Policy
+@using HotelBooking.Domain.Models
+@using Microsoft.AspNetCore.Mvc;
+@using HotelBooking.Domain.IServices
+@using MatBlazor
+@using Microsoft.EntityFrameworkCore
+@inject IHotelService HotelService
+@inject NavigationManager NavigationManager
+
+<link href="/css/StyleSheet.css" rel="stylesheet" />
+<h1>Список отелей</h1>
+
+<p>Здесь похоже должно быть информейшн об отелях... Но что-то пошло не так...</p>
+
+@if (_hotels == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div style="width:100%; height:1px; clear:both;"></div>
+    <div class="aaaa">
+        @foreach (var hotel in _hotels.OrderBy(x => x.Id))
+        {
+            <div class="divann" style="height: 30%; width: 30%">
+                <MatCard class="demo-mat-card">
+                    <MatCardContent>
+                        @if (hotel.ImageId != null)
+                        {
+                            string format = "image/jpeg";
+                            // Make a data URL so we can display it
+                            string imageDataUri = $"data:{format};base64,{Convert.ToBase64String(hotel.Image.Image)}";
+                            //<img src="@imageDataUri" style="width: 30%; height: 30%" />
+                        }
+
+                        <!-- <MatCardMedia ImageUrl=""></MatCardMedia> -->
+                        <div class="demo-mat-card-content">
+                            <MatHeadline6 class="demo-mat-card-clean-margin">
+                                @hotel.Name
+                            </MatHeadline6>
+                            <MatSubtitle2 class="demo-mat-card-clean-margin">
+                                Class: @hotel.HotelClass.Name Stars: @GetHotelStars(hotel.Stars)
+                            </MatSubtitle2>
+                        </div>
+
+                        <MatBody2 class="demo-mat-card-content demo-mat-card-clean-margin">
+                            City: @hotel.Street.City.Name Street: @hotel.Street.Name Home number: @hotel.HomeNumber
+                        </MatBody2>
+                    </MatCardContent>
+                    <MatCardActions>
+                        <MatCardActionButtons>
+                            <MatButton Name="@(new string("button_open_hotel_info_" + hotel.Id))" @onclick="_ => OpenHotelInfo(hotel.Id)">Info</MatButton>
+                            <!--<MatButton Name="@(new string("button_remove_hotel_" + hotel.Id))" @onclick="_ => RemoveHotel(hotel.Id)">Delete</MatButton>-->
+                        </MatCardActionButtons>
+                        <!--
+                        <MatCardActionIcons>
+                            <MatIconButton Icon="@MatIconNames.Favorite"></MatIconButton>
+                            <MatIconButton Icon="@MatIconNames.Dashboard"></MatIconButton>
+                        </MatCardActionIcons>
+                        -->
+                    </MatCardActions>
+                </MatCard>
+            </div>
+        }
+    </div>
+    <div style="width:100%; height:1px; clear:both;"></div>
+}
+
+<div>
+    <MatButton Raised="true" @onclick="AddHotel">Добавить</MatButton>
+    <MatButton @onclick="UpdateHotelList">Обновить список</MatButton>
+</div>
+
+
+@code {
+    private Hotel[] _hotels;
+    private int itemIndex = 0;
+
+    private void OpenHotelInfo(int id)
+    {
+        NavigationManager.NavigateTo($"./hotel/{id}");
+    }
+
+    private void RemoveHotel(int hotelId)
+    {
+        HotelService.RemoveById(hotelId);
+    }
+
+    private void AddHotel()
+    {
+        NavigationManager.NavigateTo($"./hotel/add");
+    }
+
+    private async Task UpdateHotelList()
+    {
+        _hotels = null;
+        _hotels = await HotelService.GetAllWithInclude();
+    }
+
+    private string GetHotelStars(int count)
+    {
+        return new string('⭐', count);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hotels = await HotelService.GetAllWithInclude();
+    }
+}

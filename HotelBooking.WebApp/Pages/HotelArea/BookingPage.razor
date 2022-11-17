@@ -1,0 +1,120 @@
+﻿@page "/booking/room/{RoomId:int}"
+@using System.Security.Policy
+@using Microsoft.AspNetCore.Mvc;
+@using HotelBooking.Domain.IServices
+@using HotelBooking.Domain.Models
+@using System.IO;
+@using System.Security.Cryptography.X509Certificates
+@using MatBlazor
+
+@inject IBookingService BookingService
+@inject IHotelService HotelService
+@inject IRoomService RoomService
+@inject NavigationManager NavigationManager
+@inject IMatDialogService MatDialogService
+
+
+<link href="/css/StyleSheet.css" rel="stylesheet" />
+
+<h3>Подтвердите свою бронь</h3>
+
+@if (RoomId > 0)
+{
+    if (_hotelRoom == null)
+    {
+        <p><em>Not found...</em></p>}
+    else
+    {
+        if (_hotel != null)
+        {
+            <h4>Информация об отеле:</h4>
+            <p>Наименование отеля: @_hotel.Name </p>
+            <p>Тип отеля: @_hotel.HotelClass.Name </p>
+            <p>Кол-во звезд отеля: @GetHotelStars(_hotel.Stars) </p>
+            <p>Раположение отеля: Город - @_hotel.Street.City.Name, Улица - @_hotel.Street.Name, Дом - @_hotel.HomeNumber</p>
+            <br />
+        }
+
+        <h4>Информация о комнате:</h4>
+        <p>Номер комнаты: @_hotelRoom.Number </p>
+        <p>Этаж: @_hotelRoom.Floor </p>
+        if (_hotelRoom.RoomType != null)
+        {
+            <p>Тип комнаты: @_hotelRoom.RoomType.Name </p>
+        }
+
+        @if (@_hotelRoom.SpecialCost != null)
+        {
+            <p>Особая стоимость комнаты: @_hotelRoom.SpecialCost</p>
+        }
+        else
+        {
+            if (_hotelRoom.RoomType != null)
+            {
+                <p>Стоимость комнаты: @_hotelRoom.RoomType.Cost </p>
+            }
+        }
+        <br />
+
+        if (_hotelRoom.RoomInfo != null)
+        {
+            <h4>Подробная информация о комнате:</h4>
+            <p>Количество комнат: @_hotelRoom.RoomInfo.RoomsAmount </p>
+            if (@_hotelRoom.RoomInfo.SquareMeters != null)
+            {
+                <p>Количество комнат: @_hotelRoom.RoomInfo.SquareMeters </p>
+            }
+            <p>Балкон: @(_hotelRoom.RoomInfo.Balcony ? "Есть" : "Нет") </p>
+            <p>Кондиционер: @(_hotelRoom.RoomInfo.Conditioner ? "Есть" : "Нет") </p>
+            <p>Ванная комната: @(_hotelRoom.RoomInfo.Bathroom ? "Есть" : "Нет") </p>
+            <p>Кухонная комната: @(_hotelRoom.RoomInfo.Kitchen ? "Есть" : "Нет") </p>
+            <p>Звукоизоляция: @(_hotelRoom.RoomInfo.SoundIsolation ? "Есть" : "Нет") </p>
+            <p>Телевизор: @(_hotelRoom.RoomInfo.Tv ? "Есть" : "Нет")</p>
+            <p>Стиральная машина: @(_hotelRoom.RoomInfo.WashingMachine ? "Есть" : "Нет") </p>
+            <br />
+        }
+        <div>
+            <MatButton Raised="true" @onclick="BookClick">Забронировать</MatButton>
+        </div>
+    }
+}
+else
+{
+    <p><em>Что за дела, почему тут такой параметр</em></p>
+}
+
+@code {
+    [Parameter]
+    public int RoomId { get; set; }
+
+    private Hotel _hotel;
+    private Room _hotelRoom;
+
+    private void BookClick()
+    {
+        Booking currentBooking = new Booking
+        {
+            UserId = 1,
+            HotelId = _hotelRoom.HotelId,
+            RoomId = _hotelRoom.Id,
+            StartDate = DateTime.Now,
+            StartTime = TimeSpan.Zero,
+            EndDate = DateTime.Now.AddDays(7),
+            EndTime = TimeSpan.Zero,
+            BookingStatusId = 1
+        };
+        BookingService.Add(currentBooking);
+        NavigationManager.NavigateTo($"/");
+    }
+
+    private string GetHotelStars(int count)
+    {
+        return new string('⭐', _hotel.Stars);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hotelRoom = await RoomService.GetByIdWithInclude(RoomId);
+        _hotel = await HotelService.GetByIdWithInclude(RoomId);
+    }
+}

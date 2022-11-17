@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HotelBooking.Api</name>
+    </assembly>
+    <members>
+        <member name="M:HotelBooking.Api.Controllers.BookingController.Get">
+            <summary>
+            Get all booking data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.BookingController.Get(System.Int32)">
+            <summary>
+            Get booking data by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.BookingController.Post(HotelBooking.Domain.Models.Booking)">
+            <summary>
+            Add booking into database
+            </summary>
+            <param name="booking"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.BookingController.Put(HotelBooking.Domain.Models.Booking)">
+            <summary>
+            Update booking data 
+            </summary>
+            <param name="booking"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.BookingController.Delete(System.Int32)">
+            <summary>
+            Delete booking by id
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.ChequeController.Get">
+            <summary>
+            Get all cheque data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.ChequeController.Get(System.Int32)">
+            <summary>
+            Get cheque data by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.ChequeController.Put(HotelBooking.Domain.Models.Cheque)">
+            <summary>
+            Update cheque data 
+            </summary>
+            <param name="cheque"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.ChequeController.Delete(System.Int32)">
+            <summary>
+            Delete cheque by id
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.CityController.Get">
+            <summary>
+            Get all city data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.CityController.Get(System.Int32)">
+            <summary>
+            Get city data by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.CityController.Put(HotelBooking.Domain.Models.City)">
+            <summary>
+            Update city data 
+            </summary>
+            <param name="city"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.HotelController.Get">
+            <summary>
+            Get all hotels
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.HotelController.Get(System.Int32)">
+            <summary>
+            Get hotel by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.HotelController.Post(HotelBooking.Domain.Models.Hotel)">
+            <summary>
+            Add hotel into database
+            </summary>
+            <param name="hotel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.HotelController.Put(HotelBooking.Domain.Models.Hotel)">
+            <summary>
+            Update hotel data
+            </summary>
+            <param name="hotel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.HotelController.Delete(System.Int32)">
+            <summary>
+            Delete hotel by id
+            </summary>
+            <param name="hotelId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.RoomController.Get">
+            <summary>
+            Get all room data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.RoomController.Get(System.Int32)">
+            <summary>
+            Get room data by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.RoomController.Post(HotelBooking.Domain.Models.Room)">
+            <summary>
+            Add room into database
+            </summary>
+            <param name="room"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.RoomController.Put(HotelBooking.Domain.Models.Room)">
+            <summary>
+            Update room data 
+            </summary>
+            <param name="room"></param>
+        </member>
+        <member name="M:HotelBooking.Api.Controllers.RoomController.Delete(System.Int32)">
+            <summary>
+            Delete room by id
+            </summary>
+            <param name="id"></param>
+        </member>
+    </members>
+</doc>

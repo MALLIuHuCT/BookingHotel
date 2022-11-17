@@ -1,0 +1,33 @@
+﻿@page "/bookings/"
+@using HotelBooking.Domain.IServices
+@using HotelBooking.Domain.Models
+@inject IBookingService BookingService
+
+<h3>BookingPage</h3>
+@if (_bookings == null)
+{
+    <p>Информации пока нет...</p>
+}
+else
+{
+    @foreach (var booking in _bookings)
+    {
+        <div>
+            <p>Id: @booking.Id</p>
+            <p>Hotel id: @booking.HotelId</p>
+            <p>Room id: @booking.RoomId</p>
+            <p>Start date: @booking.StartDate</p>
+            <p>End date: @booking.EndDate</p>
+            <p>Booking status id: @booking.BookingStatusId</p>
+        </div>
+        <br/>
+    }
+}
+
+@code {
+    Booking[] _bookings;
+    protected override async Task OnInitializedAsync()
+    {
+        _bookings = await BookingService.GetAll();
+    }
+}

@@ -1,0 +1,70 @@
+﻿@page "/image"
+@using System.Diagnostics
+@using System.IO
+@using HotelBooking.Domain.IServices
+@using HotelBooking.Domain.Models
+@using MatBlazor
+@inject IHotelImageService HotelImageService
+
+<h1>Image file</h1>
+
+<p>A single file input that reads the input as an image in a chosen format with specified maximum dimensions.</p>
+
+@if (!string.IsNullOrEmpty(imageDataUri))
+{
+    <img src="@imageDataUri" style="width: 50%; height: 50%" />
+}
+
+<MatFileUpload OnChange="@FilesReadyForContent"></MatFileUpload>
+<textarea style="width: 100%; max-height: 300px; height: 300px;">@fileContent</textarea>
+
+@code
+{
+    string fileContent;
+    string imageDataUri;
+
+    async Task FilesReadyForContent(IMatFileUploadEntry[] files)
+    {
+        try
+        {
+            var file = files.FirstOrDefault();
+            if (file == null)
+            {
+                return;
+            }
+
+            using (var stream = new MemoryStream())
+            {
+                var sw = Stopwatch.StartNew();
+                await file.WriteToStreamAsync(stream);
+                sw.Stop();
+
+                fileContent = "";
+                fileContent += $"Name:\t{file.Name}\r\n";
+                fileContent += $"Type:\t{file.Type}\r\n";
+                fileContent += $"LastModified:\t{file.LastModified}\r\n";
+                fileContent += $"Size:\t{file.Size}\r\n";
+                fileContent += $"Time:\t{sw.Elapsed}\r\n";
+                fileContent += $"Speed:\t{(stream.Length / sw.Elapsed.TotalSeconds):N0}  b/s\r\n";
+
+                HotelImage hotelImage = new HotelImage
+                {
+                    Image = stream.ToArray()
+                };
+                //hotelImage = HotelImageService.Add(hotelImage);
+                // Make a data URL so we can display it
+                var format = "image/jpeg";
+                imageDataUri = $"data:{format};base64,{Convert.ToBase64String(hotelImage.Image)}";
+            }
+        }
+
+        catch (Exception e)
+        {
+            fileContent = $"Error:\r\n{e.Message}\r\n{e.StackTrace}";
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

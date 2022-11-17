@@ -1,0 +1,161 @@
+﻿@page "/hotel/{HotelId:int}"
+
+@using System.Security.Policy
+@using Microsoft.AspNetCore.Mvc;
+@using HotelBooking.Domain.IServices
+@using HotelBooking.Domain.Models
+@using System.IO;
+@using System.Security.Cryptography.X509Certificates
+@using MatBlazor
+@inject IHotelService HotelService
+@inject IHotelImageService HotelImageService
+@inject IRoomService RoomService
+@inject NavigationManager NavigationManager
+@inject IMatDialogService MatDialogService
+
+<link href="/css/StyleSheet.css" rel="stylesheet" />
+
+<h3>Hotel Page</h3>
+
+@if (HotelId > 0)
+{
+    if (_hotel == null)
+    {
+        <p><em>Not found...</em></p>}
+    else
+    {
+        <div>
+            <MatButton Raised="true" @onclick="ChangeEditMode">Редактировать</MatButton>
+            <MatButton Raised="true" @onclick="_ => RemoveHotel(_hotel.Id)">Удалить</MatButton>
+        </div>
+        if (isEditMode)
+        {
+            <p>
+                Наименование отеля: 
+                <MatTextField @bind-Value="@_hotel.Name" Label="Standard"></MatTextField>
+            </p>
+            <p>
+                Тип отеля:
+                <MatSelectValue @bind-Value="@classifications[0]" Items="@classifications" ValueSelector=@(i => i.ToString())></MatSelectValue>
+            </p>
+            <p style="width: 10%">
+                Кол-во звезд отеля:
+                <MatSlider @bind-Value="@_hotel.Stars" Discrete="true" Pin="true" TValue="byte" ValueMin="0" ValueMax="5"></MatSlider>
+            </p>
+            <p>Раположение отеля: Город - @_hotel.Street.City.Name, Улица - @_hotel.Street.Name, Дом - @_hotel.HomeNumber</p>
+            <MatButton Raised="true" @onclick="UpdateHotel">Сохранить</MatButton>
+        }
+        else
+        {
+            <p>Наименование отеля: @_hotel.Name </p>
+            <p>Тип отеля: @_hotel.HotelClass.Name </p>
+            <p>Кол-во звезд отеля: @GetHotelStars(_hotel.Stars) </p>
+            <p>Раположение отеля: Город - @_hotel.Street.City.Name, Улица - @_hotel.Street.Name, Дом - @_hotel.HomeNumber</p>
+            <div class="aaaa">
+                @foreach (var room in _hotelRooms.OrderBy(x => x.Floor).ThenBy(y => y.Number))
+                {
+                    <div class="divann" style="height: 30%; width: 30%">
+                        <MatCard class="demo-mat-card">
+                            <MatCardContent>
+                                <!-- <MatCardMedia ImageUrl=""></MatCardMedia> -->
+                                <div class="demo-mat-card-content">
+                                    <MatHeadline6 class="demo-mat-card-clean-margin">
+                                        Номер: @room.Number Отель: @room.HotelId
+                                    </MatHeadline6>
+                                    <MatSubtitle2 class="demo-mat-card-clean-margin">
+                                        Тип номера: @room.RoomType.Name Id: @room.Id
+                                    </MatSubtitle2>
+                                </div>
+
+                                <MatBody2 class="demo-mat-card-content demo-mat-card-clean-margin">
+                                    Этаж: @room.Floor Стоимость: @room.RoomType.Cost
+                                </MatBody2>
+                            </MatCardContent>
+                            <MatCardActions>
+                                <MatCardActionButtons>
+                                    <MatButton @onclick="_ => OpenRoomBooking(room.Id)">Забронировать</MatButton>
+                                </MatCardActionButtons>
+                            </MatCardActions>
+                        </MatCard>
+                    </div>
+                }
+            </div>
+        }
+
+        if (_hotel.ImageId != null)
+        {
+            string format = "image/jpeg";
+            // Make a data URL so we can display it
+            imageDataUri = $"data:{format};base64,{Convert.ToBase64String(_hotel.Image.Image)}";
+        }
+
+        @if (!string.IsNullOrEmpty(imageDataUri))
+        {
+            <br />
+            <img src="@imageDataUri" />
+        }
+    }
+}
+else
+{
+    <p><em>Что за дела, почему тут такой параметр</em></p>
+}
+
+@code {
+    [Parameter]
+    public int HotelId { get; set; }
+
+    private Hotel _hotel;
+    private Room[] _hotelRooms;
+    private string imageDataUri;
+    private bool isEditMode = false;
+
+    private string[] classifications = new string[]
+    {
+        "Отель",
+        "Хостел",
+        "Гостевой дом",
+        "Отель для свиданий",
+        "Капсульный отель",
+        "Кемпинги",
+        "Дом для отпуска"
+    };
+
+
+    private async Task RemoveHotel(int id)
+    {
+        var result = await MatDialogService.ConfirmAsync("Are you sure to continue?");
+        if (result == true)
+        {
+            HotelService.RemoveById(id);
+            NavigationManager.NavigateTo($"./hotels/");
+        }
+    }
+
+    private void ChangeEditMode()
+    {
+        isEditMode = !isEditMode;
+    }
+
+    private void UpdateHotel()
+    {
+        isEditMode = !isEditMode;
+        HotelService.Update(_hotel);
+    }
+
+    private string GetHotelStars(int count)
+    {
+        return new string('⭐', _hotel.Stars);
+    }
+
+    private void OpenRoomBooking(int roomId)
+    {
+        NavigationManager.NavigateTo($"./booking/room/{roomId}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hotel = await HotelService.GetByIdWithInclude(HotelId);
+        _hotelRooms = await RoomService.GetAllWithIncludeByHotelId(_hotel.Id);
+    }
+}
